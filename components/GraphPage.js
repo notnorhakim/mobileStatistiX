@@ -3,7 +3,28 @@ import { View, Dimensions, StyleSheet, ScrollView, Text, Button, Modal, Touchabl
 import { LineChart } from 'react-native-chart-kit';
 import { getCountryIndicator } from '../services/api';  // Adjust the path if necessary
 
-const GraphPage = ({ route }) => {
+export const formatNumberWithCommas = (number) => {
+    if (number === null || number === undefined) { //number contains decimal
+      return '0';
+    } else if (number % 1 !== 0) {
+      return number.toFixed(2); 
+    } else {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    
+};
+export const findNextValue = (data) => {
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].value !== null && data[i].value !== undefined) {
+            console.log(data[i].value);
+            return data[i].value;
+        }
+    }
+    return null; // Return null if no valid value is found
+};
+
+const GraphPage = ({ route, navigation }) => {
   const { data } = route.params;
   const [graphs, setGraphs] = useState([{ data }]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -46,6 +67,7 @@ const GraphPage = ({ route }) => {
     }
 };
 
+
   const renderPickerItems = () => {
     return (
       <FlatList
@@ -63,14 +85,18 @@ const GraphPage = ({ route }) => {
     );
   };
 
+  const handleCompileGraphs = () => {
+    navigation.navigate('CompiledGraphs', { graphs });
+  };
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.indicatorText}>{data[0].indicator.value}</Text>
       {graphs.map((graphData, index) => (
         <View key={index} style={styles.graphContainer}>
           <Text style={styles.countryText}>
-             {graphData.data[0].country.value}'s Latest : {graphData.data[graphData.data.length - 1].value}
-         </Text>
+          {graphData.data[0].country.value}'s Latest: {formatNumberWithCommas(findNextValue(graphData.data))}
+          </Text>
           <ScrollView horizontal={true}>
             <LineChart
               data={{
@@ -92,7 +118,18 @@ const GraphPage = ({ route }) => {
           </ScrollView>
         </View>
       ))}
-      <Button title="Add Another Graph" onPress={addGraph} />
+      <View style={styles.buttonContainer}>
+        <Button 
+          title="Add Another Graph" 
+          onPress={addGraph} 
+          color="#841584" // Example color
+        />
+        <Button 
+          title="Compile Graphs"
+          onPress={() => navigation.navigate('CompiledGraphs', { graphs })}
+          color="#841584"
+        />
+      </View>
       <Modal
         visible={modalVisible}
         animationType="slide"
@@ -101,7 +138,7 @@ const GraphPage = ({ route }) => {
         <View style={styles.modalContainer}>
           <Text style={styles.modalTitle}>Select a Country</Text>
           {renderPickerItems()}
-          <Button title="Close" onPress={() => setModalVisible(false)} />
+        <Button title="Close" onPress={() => setModalVisible(false)} />
         </View>
       </Modal>
     </ScrollView>
@@ -121,18 +158,25 @@ const chartConfig = {
     stroke: '#ffa726',
   },
   xAxisLabelRotation: 45, // Rotate the x-axis labels to avoid overlap
-  paddingLeft: 200,  // Move the graph to the right
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    borderWidth: 2,
+    borderColor: 'green',
+    paddingBottom: 30, // Add padding to avoid overlap with navigation buttons
+  },
+  buttonContainer: {
+    marginBottom: 50, // Ensure the buttons are not at the very bottom
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   graphContainer: {
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: 'red',
+    borderColor: 'grey',
     borderRadius: 10,
     backgroundColor: '#f9f9f9',
   },
