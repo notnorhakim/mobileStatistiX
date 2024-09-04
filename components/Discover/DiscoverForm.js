@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, Button, StyleSheet, ScrollView, Modal } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { getLifeExpectancy , getWorldPopulationRank, getTotalLifeExpectancy, calculateLifeStats} from './statsAPI';
+import SimpleLineBar from './LifeProgressBar'; // Import the progress bar component
+
 
 
 
@@ -214,6 +217,15 @@ const handleDiscover = async () => {
         
         const upcomingMilestones = calculateUpcomingMilestone(formattedBirthdate);
         
+        const [ worldPopulationRank , lifeExpectancy, totalLifeExpectancy, calculatedLifeStats] = await Promise.all([
+            getWorldPopulationRank(formattedBirthdate, selectedGender, selectedCountry),
+            getLifeExpectancy(selectedGender, selectedCountry, formattedBirthdate, age.years),
+            getTotalLifeExpectancy(selectedGender, selectedCountry, formattedBirthdate),
+            calculateLifeStats(age, formattedBirthdate, selectedGender, selectedCountry),
+
+          ]);
+          
+          
         
 
         const combinedStats = {
@@ -225,6 +237,10 @@ const handleDiscover = async () => {
         currentWorldPopulation,
         upcomingMilestones,
         selectedCountry,
+        worldPopulationRank,
+        lifeExpectancy,
+        totalLifeExpectancy,
+        calculatedLifeStats
         };
 
         setStats(combinedStats);
@@ -324,6 +340,20 @@ const handleDiscover = async () => {
             You will be {milestone.milestone.toLocaleString()} days old on {milestone.date.toDateString()}
           </Text>
         ))}
+        <Text>World Population Rank (Same Sex & Country): {stats.worldPopulationRank}</Text>
+        <Text>Average Life Expectancy: {stats.totalLifeExpectancy.totalLifeExpectancy}</Text>
+        <Text>Remaining Life Expectancy: {stats.lifeExpectancy.remainingLifeExpectancy}</Text>
+        <SimpleLineBar
+            age={stats.age.years}  // Pass the current age in years
+            totalLifeExpectancy={stats.totalLifeExpectancy.totalLifeExpectancy || 80}  // Pass total life expectancy, default to 80 if undefined
+        />
+        <Text>Eye Blinks: {stats.calculatedLifeStats.eyeBlinks}</Text>
+        <Text>Steps Taken: {stats.calculatedLifeStats.stepsTaken}</Text>
+        <Text>How Much Poop in Liters: {stats.calculatedLifeStats.poopLiters}</Text>
+        <Text>How Much Pee in Liters: {stats.calculatedLifeStats.peeLiters}</Text>
+        <Text>Screen Time: {stats.calculatedLifeStats.screenTime} hours</Text>
+        
+    
       </View>
       
       )}
@@ -370,7 +400,7 @@ const styles = StyleSheet.create({
   pickerButton: {
     padding: 12,
     borderWidth: 1,
-    borderColor: 'red',
+    borderColor: 'grey',
     borderRadius: 4,
     marginBottom: 16,
   },
