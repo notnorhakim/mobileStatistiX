@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Dimensions, StyleSheet, ScrollView, Text, Button, Modal, TouchableOpacity, FlatList } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import { getCountryIndicator } from '../services/api';  // Adjust the path if necessary
+import { getCountryIndicator } from '../../services/api';  // Adjust the path if necessary
 
 export const formatNumberWithCommas = (number) => {
     if (number === null || number === undefined) { //number contains decimal
@@ -120,7 +120,7 @@ const GraphPage = ({ route, navigation }) => {
       ))}
       <View style={styles.buttonContainer}>
         <Button 
-          title="Add Another Graph" 
+          title="Add Another Country" 
           onPress={addGraph} 
           color="#841584" // Example color
         />
@@ -164,8 +164,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    borderWidth: 2,
-    borderColor: 'green',
     paddingBottom: 30, // Add padding to avoid overlap with navigation buttons
   },
   buttonContainer: {
@@ -194,6 +192,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'left',
     marginBottom: 10,
+    padding: 10, 
   },
   modalContainer: {
     flex: 1,

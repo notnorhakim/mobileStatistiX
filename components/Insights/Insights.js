@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, Button, StyleSheet, Modal } from 'react-native';
-import { categories } from './subCategories.js';
-import { getCountryIndicator } from '../services/api';
+import { categories } from '../subCategories.js';
+import { getCountryIndicator } from '../../services/api.js';
 
 function Insights({ navigation }) {
   const [countryInput, setCountryInput] = useState('');
@@ -97,10 +97,16 @@ function Insights({ navigation }) {
 
   const handleSubmit = async () => {
     if (!selectedCountry || !mainCategory || !indicator) {
-      Alert.alert("Error", "Please select all fields before fetching data.");
+      let missingFields = [];
+      
+      if (!selectedCountry) missingFields.push('Country');
+      if (!mainCategory) missingFields.push('Category');
+      if (!indicator) missingFields.push('Indicator');
+      
+      alert("Error", `Please select: ${missingFields.join(', ')}`);
       return;
     }
-
+  
     setLoading(true);
     try {
       const response = await getCountryIndicator(selectedCountry.value, indicator);
@@ -111,6 +117,7 @@ function Insights({ navigation }) {
       setLoading(false);
     }
   };
+  
 
   const isButtonDisabled = !selectedCountry || !mainCategory || !indicator || loading;
 
@@ -118,7 +125,7 @@ function Insights({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.title}>Country Insights</Text>
 
-      <Text style={styles.label}>Type Country:</Text>
+      <Text style={styles.label}>Type Country to Select:</Text>
       <TextInput
         style={styles.input}
         value={countryInput}
@@ -149,16 +156,27 @@ function Insights({ navigation }) {
         onPress={() => openModal('indicator')}
         disabled={!mainCategory}
       >
-        <Text>{indicator ? subCategories.find(i => i.value === indicator)?.label : 'Select an indicator...'}</Text>
+      <Text>{indicator ? subCategories.find(i => i.value === indicator)?.label : 'Select an indicator...'}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={[styles.button, isButtonDisabled && styles.buttonDisabled]}
-        onPress={handleSubmit}
-        disabled={isButtonDisabled}
-      >
+        onPress={() => {
+          if (isButtonDisabled) {
+            let missingFields = [];
+            if (!selectedCountry) missingFields.push('Country(Tap to select)');
+            if (!mainCategory) missingFields.push('Category');
+            if (!indicator) missingFields.push('Indicator');
+
+            alert(`Missing Fields: ${missingFields.join(', ')}`);
+          } else {
+            handleSubmit();
+          }
+        }}
+            >
         <Text style={styles.buttonText}>Get Data</Text>
       </TouchableOpacity>
+
 
       {loading && <Text>Loading...</Text>}
 
@@ -208,7 +226,7 @@ const styles = StyleSheet.create({
   pickerButton: {
     padding: 12,
     borderWidth: 1,
-    borderColor: 'gray',
+    borderColor: 'red',
     borderRadius: 4,
     marginBottom: 16,
   },

@@ -17,7 +17,7 @@ const CompiledGraphs = ({ route }) => {
         {graphs.map((graphData, index) => (
           <View key={index} style={styles.graphWrapper}>
             <Text style={styles.countryText}>{graphData.data[0].country.value}</Text>
-            <Text style={styles.countryText}>Latest: {findNextValue(graphData.data)}</Text>
+            <Text style={styles.countryText}>Latest: {formatNumberWithCommas(findNextValue(graphData.data))}</Text>
             <LineChart
               data={{
                 labels: graphData.data.map(item => item.date).reverse(),
@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
   chartStyle: {
     marginVertical: 10,
     borderRadius: 10,
+    paddingLeft: 7,
   },
 });
 
