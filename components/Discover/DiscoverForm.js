@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, Button, StyleSheet, ScrollView, Modal } from 'react-native';
+import { View, Text, TextInput, FlatList, TouchableOpacity, Button, StyleSheet, ScrollView, Modal, Share} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getLifeExpectancy , getWorldPopulationRank, getTotalLifeExpectancy, calculateLifeStats} from './statsAPI';
 import SimpleLineBar from './LifeProgressBar'; // Import the progress bar component
@@ -36,91 +36,193 @@ const calculateHeartbeatsAndBreaths = (birthdate) => {
     const heartbeats = daysAlive * 24 * 60 * averageHeartRate;
     const breaths = daysAlive * 24 * 60 * averageBreathsPerMinute;
 
-
     return { heartbeats, breaths };
 };
   
-  // Helper function to calculate age in years, months, and days
-const calculateAge = (birthdate) => {
-    // Split the birthdate in the format YYYY-MM-DD
-    const [year, month, day] = birthdate.split('-');
+
+// Helper function to calculate age in years, months, and days
+function calculateAge(birthdate) {
+  // Split the birthdate in the format YYYY-MM-DD
+  const [year, month, day] = birthdate.split('-');
+
+  // Create a Date object using the year, month (subtract 1 because months are zero-indexed), and day
+  const birthDateObj = new Date(year, month - 1, day);
+
+  if (isNaN(birthDateObj.getTime())) {
+    return { years: 'Invalid date', months: '', days: '' };
+  }
+
+  const today = new Date();
+  let years = today.getFullYear() - birthDateObj.getFullYear();
+  let months = today.getMonth() - birthDateObj.getMonth();
+  let days = today.getDate() - birthDateObj.getDate();
+
+  // Adjust the months and days if necessary
+  if (days < 0) {
+    months -= 1;
+    days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+  }
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+
+  return { years, months, days };
+}
+  
+  
+// Helper function to calculate upcoming day milestones, including quarter-life, half-life, 75%, and 100% milestones
+const calculateUpcomingMilestone = (birthdate, lifeExpectancyYears, milestones = [10000, 20000, 30000]) => {
+  const birthDateObj = new Date(birthdate);
+  if (isNaN(birthDateObj.getTime())) {
+    return 'Invalid date';
+  }
+
+  const lifeExpectancy = parseFloat(lifeExpectancyYears.split(' ')[0]); // Extract the numerical part of life expectancy
+
+  // Calculate life milestones (quarter-life, half-life, 75%, full-life)
+  const quarterLifeYears = lifeExpectancy / 4;
+  const halfLifeYears = lifeExpectancy / 2;
+  const threeQuarterLifeYears = (lifeExpectancy * 3) / 4;
+  const fullLifeYears = lifeExpectancy;
+
+  // Calculate milestone dates
+  const quarterLifeDate = new Date(birthDateObj);
+  const halfLifeDate = new Date(birthDateObj);
+  const threeQuarterLifeDate = new Date(birthDateObj);
+  const fullLifeDate = new Date(birthDateObj);
+
+  quarterLifeDate.setFullYear(quarterLifeDate.getFullYear() + quarterLifeYears);
+  halfLifeDate.setFullYear(halfLifeDate.getFullYear() + halfLifeYears);
+  threeQuarterLifeDate.setFullYear(threeQuarterLifeDate.getFullYear() + threeQuarterLifeYears);
+  fullLifeDate.setFullYear(fullLifeDate.getFullYear() + fullLifeYears);
+
+  // Calculate the other milestones (like 10,000 days, etc.)
+  const upcomingMilestones = milestones.map(milestone => {
+    const milestoneDate = new Date(birthDateObj);
+    milestoneDate.setDate(milestoneDate.getDate() + milestone);
+    return { milestone, date: milestoneDate };
+  });
+
+  // Add life milestones (quarter, half, 75%, full) to the list
+  upcomingMilestones.push({ milestone: 'Quarter-Life  (25%)', date: quarterLifeDate });
+  upcomingMilestones.push({ milestone: 'Mid-Life  (50%)', date: halfLifeDate });
+  upcomingMilestones.push({ milestone: 'Three-Quarter-Life  (75%)', date: threeQuarterLifeDate });
+  upcomingMilestones.push({ milestone: 'Death 💀 (100%)', date: fullLifeDate });
+
+  return upcomingMilestones;
+};
+
+
+  
+  
+// API to fetch world population at birth year
+const getWorldPopulationAtBirth = async (birthYear) => {
+  try {
+    const response = await fetch(`https://api.worldbank.org/v2/country/WLD/indicator/SP.POP.TOTL?date=${birthYear}&format=json`);
     
-    // Create a Date object using the year, month (subtract 1 because months are zero-indexed), and day
-    const birthDateObj = new Date(year, month - 1, day);
+    const data = await response.json();
+    
+    return data[1][0].value;
+  } catch (error) {
+    console.error('Error fetching world population at birth:', data[1][0].value);
+    return null;
+  }
+};
   
-    if (isNaN(birthDateObj.getTime())) {
-      return { years: 'Invalid date', months: '', days: '' };
-    }
-  
-    const today = new Date();
-    let years = today.getFullYear() - birthDateObj.getFullYear();
-    let months = today.getMonth() - birthDateObj.getMonth();
-    let days = today.getDate() - birthDateObj.getDate();
-  
-    // Adjust the months and days if necessary
-    if (days < 0) {
-      months -= 1;
-      days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
-    }
-    if (months < 0) {
-      years -= 1;
-      months += 12;
-    }
-  
-    return { years, months, days };
-  };
-  
-  
-    // Helper function to calculate upcoming day milestones
-    const calculateUpcomingMilestone = (birthdate, milestones = [10000, 20000, 30000]) => {
-        const birthDateObj = new Date(birthdate); // Use the birthdate directly to create a Date object
-        if (isNaN(birthDateObj.getTime())) {
-            return 'Invalid date';
-        }
-
-        const upcomingMilestones = milestones.map(milestone => {
-            const milestoneDate = new Date(birthDateObj);
-            milestoneDate.setDate(milestoneDate.getDate() + milestone); // Properly add days to the date
-            return { milestone, date: milestoneDate };
-        });
-
-        return upcomingMilestones;
-    };
-  
-  
-  // API to fetch world population at birth year
-  const getWorldPopulationAtBirth = async (birthYear) => {
+// API to fetch world population for the current year
+const getCurrentWorldPopulation = async () => {
     try {
-      const response = await fetch(`https://api.worldbank.org/v2/country/WLD/indicator/SP.POP.TOTL?date=${birthYear}&format=json`);
-      
+      const response = await fetch('https://get-population.p.rapidapi.com/population?year=2024', {
+        method: 'GET',
+        headers: {
+          'x-rapidapi-host': 'get-population.p.rapidapi.com',
+          'x-rapidapi-key': '3001e69a44mshe33657be1823330p1243c6jsnc632e533a816'
+        },
+      });
       const data = await response.json();
-      
-      return data[1][0].value;
+      return data.readable_format; // Assuming population is the key in the response data
     } catch (error) {
-      console.error('Error fetching world population at birth:', data[1][0].value);
+      console.error('Error fetching current world population:', error);
       return null;
     }
-  };
+};
   
-  // API to fetch world population for the current year
-  const getCurrentWorldPopulation = async () => {
-      try {
-        const response = await fetch('https://get-population.p.rapidapi.com/population?year=2024', {
-          method: 'GET',
-          headers: {
-            'x-rapidapi-host': 'get-population.p.rapidapi.com',
-            'x-rapidapi-key': '3001e69a44mshe33657be1823330p1243c6jsnc632e533a816'
-          },
-        });
-        const data = await response.json();
-        return data.readable_format; // Assuming population is the key in the response data
-      } catch (error) {
-        console.error('Error fetching current world population:', error);
-        return null;
-      }
-    };
-    
+// Function to handle sharing the stats
+const handleShareStats = (stats, userName) => {
 
+   if (!userName) {
+      alert("Please enter your name before sharing.");
+      return;
+    }
+
+     // Debug: Log the username before sharing
+     console.log("Username being shared:", userName);
+
+   // Calculate the percentage of life passed
+   const lifePassedPercentage = (stats.age.years / parseFloat(stats.totalLifeExpectancy.totalLifeExpectancy.replace(' years', ''))) * 100;
+  
+   // Generate a text-based progress bar
+   const totalBlocks = 20; // Length of the progress bar in characters
+   const filledBlocks = Math.round((lifePassedPercentage / 100) * totalBlocks);
+   const emptyBlocks = totalBlocks - filledBlocks;
+   const progressBar = '█'.repeat(filledBlocks) + '░'.repeat(emptyBlocks); // Text-based progress bar
+  // Format the statistics into a readable string
+  const shareableText = `
+    Name: ${userName}
+    Country: ${stats.selectedCountry}
+    Age: ${stats.age.years} years, ${stats.age.months} months, and ${stats.age.days} days
+    Total Days Alive: ${stats.daysAlive.toLocaleString()}
+    Average Life Expectancy: ${stats.totalLifeExpectancy.totalLifeExpectancy}
+    Remaining Life Expectancy: ${stats.lifeExpectancy.remainingLifeExpectancy}
+    Progress Bar: [${progressBar}] \n 
+    ${lifePassedPercentage.toFixed(2)}% of life has passed.
+    No. of Heartbeats taken: ${stats.heartbeats.toLocaleString()}
+    No. of Breaths taken: ${stats.breaths.toLocaleString()}
+    World Population at Birth: ${stats.worldPopulationAtBirth.toLocaleString()}
+    Current World Population: ${stats.currentWorldPopulation.toLocaleString()}
+    Country Population Rank (Same Gender): # ${stats.worldPopulationRank}
+    Eye Blinks: ${stats.calculatedLifeStats.eyeBlinks}
+    Steps Taken: ${stats.calculatedLifeStats.stepsTaken}
+    Sleep Time: ${stats.calculatedLifeStats.sleepTime} hours
+    Screen Time: ${stats.calculatedLifeStats.screenTime} hours
+    👇
+    👇
+    👇
+    \n\nUpcoming Milestones:\n
+    ${stats.upcomingMilestones.map(milestone => `
+        ${milestone.milestone === 'Half-Life Milestone' ? 'Half of your life' : milestone.milestone.toLocaleString()} on ${milestone.date.toDateString()}
+    `).join('')}
+    `.replace(/\n\s+/g, '\n'); // Clean up extra spaces and newlines
+
+
+  // Trigger the native share dialog
+  Share.share({
+    message: shareableText,
+  })
+  .then((result) => console.log(result))
+  .catch((error) => console.log(error.message));
+};
+
+const ShareStatsComponent = ({ stats }) => {
+  const [userName, setUserName] = useState(''); // State to store user's name
+
+  return (
+    <View style={styles.shareContainer}>
+      {/* Text input to collect the user's name */}
+      <TextInput
+        style={styles.inputName}
+        placeholder="Enter your name before sharing"
+        value={userName}
+        onChangeText={setUserName}
+      />
+   
+
+
+      <Button title="Share Stats" onPress={() => handleShareStats(stats, userName)} />
+    </View>
+  );
+};
 
 function DiscoverBirthdate() {
 
@@ -134,10 +236,10 @@ function DiscoverBirthdate() {
   const [selectedGender, setSelectedGender] = useState(''); // Selected gender
   const [genderModalVisible, setGenderModalVisible] = useState(false); // Control gender modal visibility
 
-   // List of gender options
-   const genders = [
-    { label: 'Male', value: 'male' },
-    { label: 'Female', value: 'female' },
+  // List of gender options
+  const genders = [
+  { label: 'Male', value: 'male' },
+  { label: 'Female', value: 'female' },
   ];
  
 
@@ -146,16 +248,15 @@ function DiscoverBirthdate() {
       try {
         const response = await fetch('https://api.worldbank.org/v2/country?format=json&per_page=300');
         const data = await response.json();
-        if (data && data[1]) {
-          setCountries(data[1].map(country => ({ label: country.name, value: country.id })));
-        } else {
-          console.error('Unexpected response format:', data);
-        }
+      if (data && data[1]) {
+        setCountries(data[1].map(country => ({ label: country.name, value: country.id })));
+      } else {
+        console.error('Unexpected response format:', data);
+      }
       } catch (error) {
         console.error('Error fetching countries:', error);
       }
     };
-
     fetchCountries();
   }, []);
 
@@ -185,8 +286,6 @@ function DiscoverBirthdate() {
     setGenderModalVisible(true);
   };
 
-
-
   const showDatepicker = () => {
     setShowDatePicker(true);
   };
@@ -197,10 +296,10 @@ function DiscoverBirthdate() {
     setBirthdate(currentDate);
   };
 
-const handleDiscover = async () => {
+  const handleDiscover = async () => {
 
     if (!birthdate || !selectedCountry) {
-        alert('Please enter your birthdate and select a country.');
+        alert('Please enter your birthdate and select a country correctly.');
         return;
     }
 
@@ -212,10 +311,9 @@ const handleDiscover = async () => {
         const { heartbeats, breaths } = calculateHeartbeatsAndBreaths(formattedBirthdate);
         const age = calculateAge(formattedBirthdate);
         const worldPopulationAtBirth = await getWorldPopulationAtBirth(birthYear);
-        
         const currentWorldPopulation = await getCurrentWorldPopulation();
         
-        const upcomingMilestones = calculateUpcomingMilestone(formattedBirthdate);
+        
         
         const [ worldPopulationRank , lifeExpectancy, totalLifeExpectancy, calculatedLifeStats] = await Promise.all([
             getWorldPopulationRank(formattedBirthdate, selectedGender, selectedCountry),
@@ -224,7 +322,7 @@ const handleDiscover = async () => {
             calculateLifeStats(age, formattedBirthdate, selectedGender, selectedCountry),
 
           ]);
-          
+        const upcomingMilestones = calculateUpcomingMilestone(formattedBirthdate, totalLifeExpectancy.totalLifeExpectancy);
           
         
 
@@ -240,7 +338,7 @@ const handleDiscover = async () => {
         worldPopulationRank,
         lifeExpectancy,
         totalLifeExpectancy,
-        calculatedLifeStats
+        calculatedLifeStats,
         };
 
         setStats(combinedStats);
@@ -248,8 +346,8 @@ const handleDiscover = async () => {
     } catch (error) {
         console.error('Error calculating or fetching data:', error);
         alert('Error fetching data. Please try again.');
-    }
-};
+      }
+  };
 
   
 
@@ -324,39 +422,52 @@ const handleDiscover = async () => {
 
       {/* Button to trigger calculation and API fetching */}
       <Button title="Submit" onPress={handleDiscover} />
-
+      <ScrollView 
+        contentContainerStyle={styles.scrollContentContainer} // Ensure ScrollView scrolls properly
+      >
       {stats && stats.age && (
         <View style={styles.resultContainer}>
+        <Text>Country: {stats.selectedCountry}</Text>
         <Text>Age: {stats.age.years} years, {stats.age.months} months, and {stats.age.days} days</Text>
         <Text>Total Days Alive: {stats.daysAlive.toLocaleString()}</Text>
-        <Text>Heartbeats: {stats.heartbeats.toLocaleString()}</Text>
-        <Text>Breaths: {stats.breaths.toLocaleString()}</Text>
-        <Text>World Population at Birth: {stats.worldPopulationAtBirth.toLocaleString()}</Text>
-        <Text>Current World Population: {stats.currentWorldPopulation.toLocaleString()}</Text>
-        <Text>Country: {stats.selectedCountry}</Text>
-        <Text>Upcoming Milestones:</Text>
-        {stats.upcomingMilestones.map((milestone, index) => (
-          <Text key={index}>
-            You will be {milestone.milestone.toLocaleString()} days old on {milestone.date.toDateString()}
-          </Text>
-        ))}
-        <Text>World Population Rank (Same Sex & Country): {stats.worldPopulationRank}</Text>
         <Text>Average Life Expectancy: {stats.totalLifeExpectancy.totalLifeExpectancy}</Text>
         <Text>Remaining Life Expectancy: {stats.lifeExpectancy.remainingLifeExpectancy}</Text>
         <SimpleLineBar
             age={stats.age.years}  // Pass the current age in years
             totalLifeExpectancy={stats.totalLifeExpectancy.totalLifeExpectancy || 80}  // Pass total life expectancy, default to 80 if undefined
         />
+        <Text>No. of Heartbeats taken: {stats.heartbeats.toLocaleString()}</Text> 
+        <Text>No. of Breaths taken: {stats.breaths.toLocaleString()}</Text>
+        <Text>World Population at Birth: {stats.worldPopulationAtBirth.toLocaleString()}</Text>
+        <Text>Current World Population: {stats.currentWorldPopulation.toLocaleString()}</Text>
+        <Text>Country Population Rank (Same Gender): # {stats.worldPopulationRank}</Text>
         <Text>Eye Blinks: {stats.calculatedLifeStats.eyeBlinks}</Text>
         <Text>Steps Taken: {stats.calculatedLifeStats.stepsTaken}</Text>
-        <Text>How Much Poop in Liters: {stats.calculatedLifeStats.poopLiters}</Text>
-        <Text>How Much Pee in Liters: {stats.calculatedLifeStats.peeLiters}</Text>
-        <Text>Screen Time: {stats.calculatedLifeStats.screenTime} hours</Text>
+        {/* <Text>How Much Poop in Liters: {stats.calculatedLifeStats.poopLiters}</Text>
+        <Text>How Much Pee in Liters: {stats.calculatedLifeStats.peeLiters}</Text> */}
+        <Text>Sleep Time: {stats.calculatedLifeStats.sleepTime} hours </Text>
+        <Text>Screen Time: {stats.calculatedLifeStats.screenTime} hours {"\n"}{"\n"}</Text>
         
-    
+        
+        
+        
+        <Text>Upcoming Milestones:</Text>
+        {stats.upcomingMilestones.map((milestone, index) => (
+          <Text key={index}>
+             {milestone.milestone === 'Half-Life Milestone' ? 'at half of your life' : milestone.milestone.toLocaleString()} on {milestone.date.toDateString()}
+          </Text>
+        ))}
+        
+        
+        
+        
+        <ShareStatsComponent stats={stats} />
+        
       </View>
       
       )}
+      </ScrollView>
+      
 
       {!stats && (
         <Text>Please enter your birthdate and select a country to discover your stats.</Text>
@@ -368,6 +479,7 @@ const handleDiscover = async () => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+    flex: 1,
   },
   title: {
     fontSize: 24,
@@ -421,8 +533,27 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'gray',
   },
+  scrollContainer: {
+    flexGrow: 1, 
+
+  },
   resultContainer: {
     marginTop: 20,
+    paddingBottom: 40,
+    borderRadius: 10,
+  },
+  shareContainer: {
+    marginTop: 20,
+  },
+  inputName: {
+    height: 40,
+    borderColor: 'grey',
+    borderWidth: 0.8,
+    width: '80%',
+    paddingLeft: 8,
+    marginBottom: 16,
+    borderRadius: 10,
+    alignSelf: 'center', 
   },
 });
 

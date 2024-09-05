@@ -130,6 +130,31 @@ const calculateScreenTime = (age, daysAlive) => {
     }
     return totalScreenTime; // Total screen time in hours
 };
+
+// Helper function to calculate total sleep time based on age
+const calculateSleepTime = (age, daysAlive) => {
+  let totalSleepTime = 0; // Initialize total sleep time in hours
+  const ageInYears = age.years;
+
+  if (ageInYears <= 1) {
+    totalSleepTime = daysAlive * 16; // 0-1 years: 14-17 hours/day (avg 16)
+  } else if (ageInYears <= 2) {
+    totalSleepTime = (365 * 1 * 16) + ((daysAlive - 365) * 12.5); // 1-2 years: 11-14 hours/day (avg 12.5)
+  } else if (ageInYears <= 5) {
+    totalSleepTime = (365 * 1 * 16) + (365 * 1 * 12.5) + ((daysAlive - 365 * 2) * 11.5); // 3-5 years: 10-13 hours/day (avg 11.5)
+  } else if (ageInYears <= 13) {
+    totalSleepTime = (365 * 1 * 16) + (365 * 1 * 12.5) + (365 * 3 * 11.5) + ((daysAlive - 365 * 5) * 10); // 6-13 years: 9-11 hours/day (avg 10)
+  } else if (ageInYears <= 17) {
+    totalSleepTime = (365 * 1 * 16) + (365 * 1 * 12.5) + (365 * 3 * 11.5) + (365 * 7 * 10) + ((daysAlive - 365 * 13) * 9); // 14-17 years: 8-10 hours/day (avg 9)
+  } else if (ageInYears <= 64) {
+    totalSleepTime = (365 * 1 * 16) + (365 * 1 * 12.5) + (365 * 3 * 11.5) + (365 * 7 * 10) + (365 * 4 * 9) + ((daysAlive - 365 * 18) * 8); // 18-64 years: 7-9 hours/day (avg 8)
+  } else {
+    totalSleepTime = (365 * 1 * 16) + (365 * 1 * 12.5) + (365 * 3 * 11.5) + (365 * 7 * 10) + (365 * 4 * 9) + (365 * 46 * 8) + ((daysAlive - 365 * 65) * 7.5); // 65+ years: 7-8 hours/day (avg 7.5)
+  }
+
+  return totalSleepTime; // Total sleep time in hours
+};
+
   
 
 // Main function to calculate all stats based on gender
@@ -149,6 +174,8 @@ export const calculateLifeStats = (age, birthdate, gender, country) => {
   const poopLiters = calculatePoopLiters(daysAlive, sex);
   const peeLiters = calculatePeeLiters(daysAlive, sex);
   const screenTime = calculateScreenTime(age, daysAlive);
+  const sleepTime = calculateSleepTime(age, daysAlive); 
+
 
   // Return the formatted data
   return {
@@ -158,6 +185,8 @@ export const calculateLifeStats = (age, birthdate, gender, country) => {
     poopLiters: poopLiters.toFixed(2), // Format with 2 decimal places
     peeLiters: peeLiters.toFixed(2),
     screenTime: screenTime.toLocaleString(),
+    sleepTime: sleepTime.toLocaleString(),
+
   };
 };
 
