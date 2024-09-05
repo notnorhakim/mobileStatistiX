@@ -1,5 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Dimensions } from 'react-native';
+
+// Get the width of the screen
+const screenWidth = Dimensions.get('window').width;
+
+// Define the size of each week square
+const WEEK_SQUARE_SIZE = 10; // Adjust as needed
+const WEEK_SQUARE_MARGIN = 1; // Margin between squares
+
+// Calculate how many squares can fit in one row based on screen width
+const numColumns = Math.floor(screenWidth / (WEEK_SQUARE_SIZE + WEEK_SQUARE_MARGIN * 2));
 
 const LifeExpectancyGraphic = ({ route }) => {
   const { daysAlive, lifeExpectancy } = route.params;
@@ -15,16 +25,31 @@ const LifeExpectancyGraphic = ({ route }) => {
   // Render each week as a box (one per week)
   const renderWeek = ({ index }) => {
     let backgroundColor;
-    
+    let label = null;
+    let textColor = 'black'; // Default text color is black
+    let borderColor = 'transparent'; // Default border color is transparent
+
+    // Determine background color based on lived or remaining weeks
     if (index < weeksAlive) {
       backgroundColor = 'blue'; // Lived weeks
+      textColor = 'white'; // White text for blue boxes (lived weeks)
     } else if (index === midLifeWeek) {
       backgroundColor = 'red'; // Mid-life indicator
     } else {
       backgroundColor = 'lightgray'; // Remaining weeks
     }
 
-    return <View style={[styles.weekSquare, { backgroundColor }]} />;
+    // Add the year number inside the first week's box for every year (e.g., 0, 52, 104, etc.)
+    if (index % 52 === 0) {
+      label = (index / 52).toString(); // Display the year inside the box
+      borderColor = 'black'; // Apply black border only to the year indicator
+    }
+
+    return (
+      <View style={[styles.weekSquare, { backgroundColor, borderColor }]}>
+        {label && <Text style={[styles.yearText, { color: textColor }]}>{label}</Text>}
+      </View>
+    );
   };
 
   return (
@@ -32,16 +57,20 @@ const LifeExpectancyGraphic = ({ route }) => {
       <Text style={styles.title}>Your Life in Weeks</Text>
       {/* Brief description below the title */}
       <Text style={styles.description}>
-        Each row in the graphic represents one year, and each box represents a week.
-        The blue boxes indicate the weeks you have already lived, the red box marks the midpoint of your life, and the gray boxes show the weeks remaining based on your life expectancy.
+        The graphic below shows your life in weeks. Each row represents as many weeks as can fit on the screen. 
+        The blue boxes represent weeks you have lived, the red box marks the midpoint of your life, 
+        and the gray boxes show the remaining weeks based on your life expectancy. 
+        The number in the box indicates the year, and year indicators have a black border.
       </Text>
 
-      {/* Render grid with 52 columns, representing one row per year */}
+      {/* Render grid with dynamic columns based on screen width */}
       <FlatList
         data={Array(totalWeeksLifeExpectancy).fill(0)}
         renderItem={renderWeek}
         keyExtractor={(item, index) => index.toString()}
-        numColumns={52} // Set 52 weeks per row (1 year)
+        numColumns={numColumns} // Dynamically calculated columns based on screen width
+        showsVerticalScrollIndicator={true}
+        showsHorizontalScrollIndicator={false}
       />
       <Text style={styles.statsText}>Weeks Lived: {weeksAlive}</Text>
       <Text style={styles.statsText}>Weeks Remaining: {weeksRemaining}</Text>
@@ -68,9 +97,14 @@ const styles = StyleSheet.create({
     marginBottom: 20, // Space below the description before the grid
   },
   weekSquare: {
-    width: 10, // Adjust the size based on your preference
-    height: 10, // Adjust the size based on your preference
-    margin: 1,
+    width: WEEK_SQUARE_SIZE,
+    height: WEEK_SQUARE_SIZE,
+    margin: WEEK_SQUARE_MARGIN,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  yearText: {
+    fontSize: 8, // Adjust to fit inside the box
   },
   statsText: {
     marginTop: 16,
