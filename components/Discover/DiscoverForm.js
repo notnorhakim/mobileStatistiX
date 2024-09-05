@@ -8,7 +8,7 @@ import SimpleLineBar from './LifeProgressBar'; // Import the progress bar compon
 
 
 // Helper function to calculate moon orbits, total days alive, etc.
-const calculateDaysAlive = (birthdate) => {
+ export const calculateDaysAlive = (birthdate) => {
     
     const birthDateObj = new Date(birthdate);
   
@@ -72,7 +72,7 @@ function calculateAge(birthdate) {
   
   
 // Helper function to calculate upcoming day milestones, including quarter-life, half-life, 75%, and 100% milestones
-const calculateUpcomingMilestone = (birthdate, lifeExpectancyYears, milestones = [10000, 20000, 30000]) => {
+export const calculateUpcomingMilestone = (birthdate, lifeExpectancyYears, milestones = [10000, 20000, 30000]) => {
   const birthDateObj = new Date(birthdate);
   if (isNaN(birthDateObj.getTime())) {
     return 'Invalid date';

@@ -23,16 +23,9 @@ function Home({ navigation }) {
       
       <TouchableOpacity 
         style={styles.card} 
-        onPress={() => navigation.navigate('ExperimentInput')}
+        onPress={() => navigation.navigate('Table')}
       >
-        <Text style={styles.cardText}>Experiment with Input</Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity 
-        style={styles.card} 
-        onPress={() => navigation.navigate('FutureFeature')}
-      >
-        <Text style={styles.cardText}>Future Feature</Text>
+        <Text style={styles.cardText}>Make your own Week Graphics</Text>
       </TouchableOpacity>
     </View>
   );

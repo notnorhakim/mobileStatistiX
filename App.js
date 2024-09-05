@@ -10,6 +10,8 @@ import InsightsResults from './components/Insights/InsightsResults';  // Import 
 import GraphPage from './components/Insights/GraphPage';  // Import the new graph component
 import CompiledGraphs from './components/Insights/CompiledGraphs';  // Import the new compiled graphs component
 import DiscoverForm from './components/Discover/DiscoverForm';  // Import the new discover form component
+import Table from './components/WeekTable/Table';
+import TableResults from './components/WeekTable/TableResults';
 
 const Stack = createStackNavigator();
 
@@ -23,6 +25,8 @@ export default function App() {
         <Stack.Screen name="GraphPage" component={GraphPage} />
         <Stack.Screen name="CompiledGraphs" component={CompiledGraphs} /> 
         <Stack.Screen name="DiscoverForm" component={DiscoverForm} />
+        <Stack.Screen name="Table" component={Table} />
+        <Stack.Screen name="TableResults" component={TableResults} />
       </Stack.Navigator>
     </NavigationContainer>
   );
