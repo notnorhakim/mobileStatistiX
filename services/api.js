@@ -15,7 +15,6 @@ export const getCountryIndicator = async (country, indicator) => {
       return response.json(); // Parse the JSON response
     })
     .then((data) => {
-        // console.log(data);
       return data[1]; // Returning the actual data array from the JSON response
     })
     .catch((error) => {

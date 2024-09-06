@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   },
   filledBar: {
     height: '100%',
-    backgroundColor: '#3b82f6', // Blue color for the filled part
+    backgroundColor: '#6200ea', // Blue color for the filled part
   },
 });
 

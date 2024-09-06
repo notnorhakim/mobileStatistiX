@@ -108,7 +108,7 @@ export const calculateUpcomingMilestone = (birthdate, lifeExpectancyYears, miles
   upcomingMilestones.push({ milestone: 'Quarter-Life  (25%)', date: quarterLifeDate });
   upcomingMilestones.push({ milestone: 'Mid-Life  (50%)', date: halfLifeDate });
   upcomingMilestones.push({ milestone: 'Three-Quarter-Life  (75%)', date: threeQuarterLifeDate });
-  upcomingMilestones.push({ milestone: 'Death 💀 (100%)', date: fullLifeDate });
+  upcomingMilestones.push({ milestone: 'Presumed Death 💀☠️💀 (100%)', date: fullLifeDate });
 
   return upcomingMilestones;
 };
@@ -170,22 +170,22 @@ const handleShareStats = (stats, userName) => {
   // Format the statistics into a readable string
   const shareableText = `
     Name: ${userName}
-    Country: ${stats.selectedCountry}
-    Age: ${stats.age.years} years, ${stats.age.months} months, and ${stats.age.days} days
-    Total Days Alive: ${stats.daysAlive.toLocaleString()}
-    Average Life Expectancy: ${stats.totalLifeExpectancy.totalLifeExpectancy}
-    Remaining Life Expectancy: ${stats.lifeExpectancy.remainingLifeExpectancy}
+    Country 🏁: ${stats.selectedCountry}
+    Age 👶: ${stats.age.years} years, ${stats.age.months} months, and ${stats.age.days} days
+    Total Days Alive 😁: ${stats.daysAlive.toLocaleString()}
+    Average Life Expectancy 🪽: ${stats.totalLifeExpectancy.totalLifeExpectancy}
+    Remaining Life Expectancy 😬: ${stats.lifeExpectancy.remainingLifeExpectancy}
     Progress Bar: [${progressBar}] \n 
     ${lifePassedPercentage.toFixed(2)}% of life has passed.
-    No. of Heartbeats taken: ${stats.heartbeats.toLocaleString()}
-    No. of Breaths taken: ${stats.breaths.toLocaleString()}
-    World Population at Birth: ${stats.worldPopulationAtBirth.toLocaleString()}
-    Current World Population: ${stats.currentWorldPopulation.toLocaleString()}
-    Country Population Rank (Same Gender): # ${stats.worldPopulationRank}
-    Eye Blinks: ${stats.calculatedLifeStats.eyeBlinks}
-    Steps Taken: ${stats.calculatedLifeStats.stepsTaken}
-    Sleep Time: ${stats.calculatedLifeStats.sleepTime} hours
-    Screen Time: ${stats.calculatedLifeStats.screenTime} hours
+    No. of Heartbeats taken ❤️: ${stats.heartbeats.toLocaleString()}
+    No. of Breaths taken👃: ${stats.breaths.toLocaleString()}
+    World Population at Birth 🔢: ${stats.worldPopulationAtBirth.toLocaleString()}
+    Current World Population 🔢: ${stats.currentWorldPopulation.toLocaleString()}
+    Country Population Rank (Same Gender) 💯: # ${stats.worldPopulationRank}
+    Eye Blinks 👁️: ${stats.calculatedLifeStats.eyeBlinks}
+    Steps Taken 🐾: ${stats.calculatedLifeStats.stepsTaken}
+    Sleep Time 💤: ${stats.calculatedLifeStats.sleepTime} hours
+    Screen Time 📱: ${stats.calculatedLifeStats.screenTime} hours
     👇
     👇
     👇
@@ -219,7 +219,10 @@ const ShareStatsComponent = ({ stats }) => {
    
 
 
-      <Button title="Share Stats" onPress={() => handleShareStats(stats, userName)} />
+   
+      <TouchableOpacity style={styles.buttonStats} onPress={() => handleShareStats(stats, userName)}>
+        <Text style={styles.buttonText}>Share Stats</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -298,10 +301,13 @@ function DiscoverBirthdate() {
 
   const handleDiscover = async () => {
 
-    if (!birthdate || !selectedCountry) {
-        alert('Please enter your birthdate and select a country correctly.');
-        return;
-    }
+    if (!birthdate || !selectedCountry || !selectedGender) {
+      alert('Please enter your birthdate and select a country and gender correctly.');
+      return;
+  } else if (birthdate.getFullYear() >= new Date().getFullYear()) {
+      alert('Please enter a valid birthdate (last year or earlier)');
+      return;
+  }
 
     try {
         
@@ -415,43 +421,47 @@ function DiscoverBirthdate() {
               </TouchableOpacity>
             )}
           />
-          <Button title="Close" onPress={() => setGenderModalVisible(false)} />
+            <TouchableOpacity style={styles.button} onPress={handleDiscover}>
+              <Text style={styles.buttonText}>Close</Text>
+            </TouchableOpacity>
         </View>
       </Modal>
 
 
       {/* Button to trigger calculation and API fetching */}
-      <Button title="Submit" onPress={handleDiscover} />
+      <TouchableOpacity style={styles.button} onPress={handleDiscover}>
+        <Text style={styles.buttonText}>Submit</Text>
+      </TouchableOpacity>
       <ScrollView 
         contentContainerStyle={styles.scrollContentContainer} // Ensure ScrollView scrolls properly
       >
       {stats && stats.age && (
         <View style={styles.resultContainer}>
-        <Text>Country: {stats.selectedCountry}</Text>
-        <Text>Age: {stats.age.years} years, {stats.age.months} months, and {stats.age.days} days</Text>
-        <Text>Total Days Alive: {stats.daysAlive.toLocaleString()}</Text>
-        <Text>Average Life Expectancy: {stats.totalLifeExpectancy.totalLifeExpectancy}</Text>
-        <Text>Remaining Life Expectancy: {stats.lifeExpectancy.remainingLifeExpectancy}</Text>
+        <Text>Country 🏁: {stats.selectedCountry}</Text>
+        <Text>Age 👶: {stats.age.years} years, {stats.age.months} months, and {stats.age.days} days</Text>
+        <Text>Total Days Alive 😁: {stats.daysAlive.toLocaleString()}</Text>
+        <Text>Average Life Expectancy 🪽: {stats.totalLifeExpectancy.totalLifeExpectancy}</Text>
+        <Text>Remaining Life Expectancy 😬: {stats.lifeExpectancy.remainingLifeExpectancy}</Text>
         <SimpleLineBar
             age={stats.age.years}  // Pass the current age in years
             totalLifeExpectancy={stats.totalLifeExpectancy.totalLifeExpectancy || 80}  // Pass total life expectancy, default to 80 if undefined
         />
-        <Text>No. of Heartbeats taken: {stats.heartbeats.toLocaleString()}</Text> 
-        <Text>No. of Breaths taken: {stats.breaths.toLocaleString()}</Text>
-        <Text>World Population at Birth: {stats.worldPopulationAtBirth.toLocaleString()}</Text>
-        <Text>Current World Population: {stats.currentWorldPopulation.toLocaleString()}</Text>
-        <Text>Country Population Rank (Same Gender): # {stats.worldPopulationRank}</Text>
-        <Text>Eye Blinks: {stats.calculatedLifeStats.eyeBlinks}</Text>
-        <Text>Steps Taken: {stats.calculatedLifeStats.stepsTaken}</Text>
+        <Text>No. of Heartbeats taken ❤️: {stats.heartbeats.toLocaleString()}</Text> 
+        <Text>No. of Breaths taken 👃: {stats.breaths.toLocaleString()}</Text>
+        <Text>World Population at Birth 🔢: {stats.worldPopulationAtBirth.toLocaleString()}</Text>
+        <Text>Current World Population 🔢: {stats.currentWorldPopulation.toLocaleString()}</Text>
+        <Text>Country Population Rank (Same Gender) 💯: # {stats.worldPopulationRank}</Text>
+        <Text>Eye Blinks 👁️: {stats.calculatedLifeStats.eyeBlinks}</Text>
+        <Text>Steps Taken 🐾: {stats.calculatedLifeStats.stepsTaken}</Text>
         {/* <Text>How Much Poop in Liters: {stats.calculatedLifeStats.poopLiters}</Text>
         <Text>How Much Pee in Liters: {stats.calculatedLifeStats.peeLiters}</Text> */}
-        <Text>Sleep Time: {stats.calculatedLifeStats.sleepTime} hours </Text>
-        <Text>Screen Time: {stats.calculatedLifeStats.screenTime} hours {"\n"}{"\n"}</Text>
+        <Text>Sleep Time 💤: {stats.calculatedLifeStats.sleepTime} hours </Text>
+        <Text>Screen Time 📱: {stats.calculatedLifeStats.screenTime} hours {"\n"}{"\n"}</Text>
         
         
         
         
-        <Text>Upcoming Milestones:</Text>
+        <Text>Upcoming Milestones 👍:</Text>
         {stats.upcomingMilestones.map((milestone, index) => (
           <Text key={index}>
              {milestone.milestone === 'Half-Life Milestone' ? 'at half of your life' : milestone.milestone.toLocaleString()} on {milestone.date.toDateString()}
@@ -554,6 +564,24 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderRadius: 10,
     alignSelf: 'center', 
+  },
+  button: {
+    backgroundColor: '#6200ea', // Custom color
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  buttonStats: {
+    backgroundColor: '#6200ea', // Custom color
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    width: '80%',
+    alignSelf: 'center',
+  },
+  buttonText: {
+    color: '#FFFFFF', // White text color
+    fontSize: 16,
   },
 });
 

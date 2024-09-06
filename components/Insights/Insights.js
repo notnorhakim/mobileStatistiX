@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, Button, StyleSheet, Modal } from 'react-native';
+import { View, Text, TextInput, FlatList, TouchableOpacity, Button, StyleSheet, Modal, Alert } from 'react-native';
 import { categories } from '../subCategories.js';
 import { getCountryIndicator } from '../../services/api.js';
 
@@ -98,25 +98,45 @@ function Insights({ navigation }) {
   const handleSubmit = async () => {
     if (!selectedCountry || !mainCategory || !indicator) {
       let missingFields = [];
-      
+  
       if (!selectedCountry) missingFields.push('Country');
       if (!mainCategory) missingFields.push('Category');
       if (!indicator) missingFields.push('Indicator');
-      
-      alert("Error", `Please select: ${missingFields.join(', ')}`);
+  
+      Alert.alert("Error", `Please select: ${missingFields.join(', ')}`);
       return;
     }
   
     setLoading(true);
+  
     try {
       const response = await getCountryIndicator(selectedCountry.value, indicator);
+      
       setLoading(false);
-      navigation.navigate('InsightsResults', { data: response });
+      console.log(response);
+      if (!response || response.length === 0) {
+        console.log("Error", "No data available for the selected country and indicator.");
+        Alert.alert("Error", "No data available for the selected country and indicator.");
+        return;
+      }
+  
+      const nonNullValuesCount = response.filter(entry => entry.value !== null && entry.value !== undefined).length;
+      console.log("Number of entries with non-null values:", nonNullValuesCount);
+  
+      if (nonNullValuesCount < 5) {
+        console.log("Error", "No data available for the selected country and indicator.");
+        Alert.alert("Error", "No data available for the selected country and indicator.");
+      } else {
+        navigation.navigate('InsightsResults', { data: response })
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
       setLoading(false);
+      Alert.alert("Error", "An error occurred while fetching data. Please try again.");
     }
   };
+
+
   
 
   const isButtonDisabled = !selectedCountry || !mainCategory || !indicator || loading;
@@ -231,7 +251,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   button: {
-    backgroundColor: 'blue',
+    backgroundColor: '#6200ea',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',

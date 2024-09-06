@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import InsightsDisplay from './InsightsDisplay';
 
 const InsightsResults = ({ route, navigation }) => {
@@ -26,14 +26,15 @@ const InsightsResults = ({ route, navigation }) => {
 
       {/* Add Buttons for Graph and Compare */}
       <View style={styles.buttonContainer}>
-        <Button
-          title="Detailed Graph"
+        <TouchableOpacity style={styles.button}
           onPress={() => navigation.navigate('GraphPage', {
             data: data, 
             countryName: country.value, 
             indicatorName: indicator.value
           })}
-        />
+        >
+          <Text style={styles.buttonText}>Detailed Graph</Text>
+        </TouchableOpacity>
 
       </View>
 
@@ -60,6 +61,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginBottom: 16,
+  },
+  button: {
+    backgroundColor: '#6200ea',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#FFFFFF', // White text color
+    fontSize: 16,
   },
 });
 

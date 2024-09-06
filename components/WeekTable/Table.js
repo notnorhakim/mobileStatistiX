@@ -127,7 +127,7 @@ function DiscoverBirthdate() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Discover Your Life Expectancy</Text>
+      <Text style={styles.title}>Visualize Your Life In Weeks</Text>
 
       {/* Button to open the date picker */}
       <Text style={styles.label}>Select Date of Birth:</Text>
@@ -189,12 +189,16 @@ function DiscoverBirthdate() {
               </TouchableOpacity>
             )}
           />
-          <Button title="Close" onPress={() => setGenderModalVisible(false)} />
+        <TouchableOpacity style={styles.button} onPress={() => setGenderModalVisible(false)}>
+            <Text style={styles.buttonText}>Close</Text>
+        </TouchableOpacity>
         </View>
       </Modal>
 
       {/* Button to trigger calculation and API fetching */}
-      <Button title="Submit" onPress={handleDiscover} />
+      <TouchableOpacity style={styles.button} onPress={handleDiscover}>
+        <Text style={styles.buttonText}>Submit</Text>
+      </TouchableOpacity>
 
       {/* Display calculated stats */}
       {stats && (
@@ -271,6 +275,17 @@ const styles = StyleSheet.create({
   resultContainer: {
     marginTop: 20,
   },
+  button: {
+    backgroundColor: '#6200ea',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+    buttonText: {
+        color: 'white',
+        fontSize: 16,
+    },
 });
 
 export default DiscoverBirthdate;

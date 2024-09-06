@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
-import { View, Dimensions, StyleSheet, ScrollView, Text, Button, Modal, TouchableOpacity, FlatList } from 'react-native';
+import { View, Dimensions, StyleSheet, ScrollView, Text, Modal, TouchableOpacity, FlatList } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { getCountryIndicator } from '../../services/api';  // Adjust the path if necessary
 
 export const formatNumberWithCommas = (number) => {
-    if (number === null || number === undefined) { //number contains decimal
+    if (number === null || number === undefined) {
       return '0';
     } else if (number % 1 !== 0) {
       return number.toFixed(2); 
     } else {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
-
-    
 };
+
 export const findNextValue = (data) => {
     for (let i = 0; i < data.length; i++) {
         if (data[i].value !== null && data[i].value !== undefined) {
@@ -29,7 +28,6 @@ const GraphPage = ({ route, navigation }) => {
   const [graphs, setGraphs] = useState([{ data }]);
   const [modalVisible, setModalVisible] = useState(false);
   const [countries, setCountries] = useState([]);
-  const [selectedCountry, setSelectedCountry] = useState('');
 
   const addGraph = async () => {
     const fetchCountries = async () => {
@@ -51,11 +49,8 @@ const GraphPage = ({ route, navigation }) => {
 
   const handleCountrySelect = async (countryCode) => {
     setModalVisible(false);
-    setSelectedCountry(countryCode);
     try {
       const response = await getCountryIndicator(countryCode, data[0].indicator.id);
-      
-      // Check if there is data available
       if (response && response.length > 0) {
         setGraphs([...graphs, { data: response }]);
       } else {
@@ -65,8 +60,7 @@ const GraphPage = ({ route, navigation }) => {
       console.error('Error fetching data:', error);
       alert('An error occurred while fetching data.');
     }
-};
-
+  };
 
   const renderPickerItems = () => {
     return (
@@ -95,7 +89,7 @@ const GraphPage = ({ route, navigation }) => {
       {graphs.map((graphData, index) => (
         <View key={index} style={styles.graphContainer}>
           <Text style={styles.countryText}>
-          {graphData.data[0].country.value}'s Latest: {formatNumberWithCommas(findNextValue(graphData.data))}
+            {graphData.data[0].country.value}'s Latest: {formatNumberWithCommas(findNextValue(graphData.data))}
           </Text>
           <ScrollView horizontal={true}>
             <LineChart
@@ -107,28 +101,21 @@ const GraphPage = ({ route, navigation }) => {
                   },
                 ],
               }}
-              width={Dimensions.get('window').width * 4} // Make the graph wider than the screen for scrolling
+              width={Dimensions.get('window').width * 4}
               height={200}
               chartConfig={chartConfig}
-              style={{
-                ...styles.chartStyle,
-                marginLeft: 10, // Add this to create more space for y-axis labels
-              }}
+              style={styles.chartStyle}
             />
           </ScrollView>
         </View>
       ))}
       <View style={styles.buttonContainer}>
-        <Button 
-          title="Add Another Country" 
-          onPress={addGraph} 
-          color="#841584" // Example color
-        />
-        <Button 
-          title="Compile Graphs"
-          onPress={() => navigation.navigate('CompiledGraphs', { graphs })}
-          color="#841584"
-        />
+        <TouchableOpacity style={styles.button} onPress={addGraph}>
+          <Text style={styles.buttonText}>Add Another Country</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={handleCompileGraphs}>
+          <Text style={styles.buttonText}>Compile Graphs</Text>
+        </TouchableOpacity>
       </View>
       <Modal
         visible={modalVisible}
@@ -138,7 +125,9 @@ const GraphPage = ({ route, navigation }) => {
         <View style={styles.modalContainer}>
           <Text style={styles.modalTitle}>Select a Country</Text>
           {renderPickerItems()}
-        <Button title="Close" onPress={() => setModalVisible(false)} />
+          <TouchableOpacity style={styles.button} onPress={() => setModalVisible(false)}>
+            <Text style={styles.buttonText}>Close</Text>
+          </TouchableOpacity>
         </View>
       </Modal>
     </ScrollView>
@@ -157,19 +146,29 @@ const chartConfig = {
     strokeWidth: '2',
     stroke: '#ffa726',
   },
-  xAxisLabelRotation: 45, // Rotate the x-axis labels to avoid overlap
+  xAxisLabelRotation: 45,
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    paddingBottom: 30, // Add padding to avoid overlap with navigation buttons
+    paddingBottom: 30,
   },
   buttonContainer: {
-    marginBottom: 50, // Ensure the buttons are not at the very bottom
+    marginBottom: 50,
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  button: {
+    backgroundColor: '#6200ea', // Custom color
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
   },
   graphContainer: {
     marginBottom: 20,
