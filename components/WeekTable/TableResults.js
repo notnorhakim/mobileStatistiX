@@ -26,7 +26,7 @@ const LifeExpectancyGraphic = ({ route }) => {
   const renderWeek = ({ index }) => {
     let backgroundColor;
     let label = null;
-    let textColor = 'black'; // Default text color is black
+    let textColor = 'black'; 
     let borderColor = 'transparent'; // Default border color is transparent
 
     // Determine background color based on lived or remaining weeks
@@ -57,10 +57,10 @@ const LifeExpectancyGraphic = ({ route }) => {
       <Text style={styles.title}>Your Life in Weeks</Text>
       {/* Brief description below the title */}
       <Text style={styles.description}>
-        The graphic below shows your life in weeks. Each row represents as many weeks as can fit on the screen. 
+        The graphic below shows your life in weeks.
         The blue boxes represent weeks you have lived, the red box marks the midpoint of your life, 
         and the gray boxes show the remaining weeks based on your life expectancy. 
-        The number in the box indicates the year, and year indicators have a black border.
+        The number in the box indicates the year. 
       </Text>
 
       {/* Render grid with dynamic columns based on screen width */}
@@ -68,7 +68,7 @@ const LifeExpectancyGraphic = ({ route }) => {
         data={Array(totalWeeksLifeExpectancy).fill(0)}
         renderItem={renderWeek}
         keyExtractor={(item, index) => index.toString()}
-        numColumns={numColumns} // Dynamically calculated columns based on screen width
+        numColumns={numColumns} 
         showsVerticalScrollIndicator={true}
         showsHorizontalScrollIndicator={false}
       />
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'gray',
     textAlign: 'center',
-    marginBottom: 20, // Space below the description before the grid
+    marginBottom: 20,
   },
   weekSquare: {
     width: WEEK_SQUARE_SIZE,
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   yearText: {
-    fontSize: 8, // Adjust to fit inside the box
+    fontSize: 8,
   },
   statsText: {
     marginTop: 16,

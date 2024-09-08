@@ -1,6 +1,4 @@
-// populationAPI.js https://d6wn6bmjj722w.population.io/#!/countries/listCountries
-
-//helper 
+//  https://d6wn6bmjj722w.population.io/#!/countries/listCountries
 
 // Helper function to format age in the required 'XyYm' format
 const formatAge = (birthdate) => {
@@ -21,33 +19,6 @@ const formatAge = (birthdate) => {
     return `${years}y${months}m`;
   };
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // The world population rank is defined as the position of someone's birthday among the group
 // of living people of the same sex and country of origin, ordered by date of birth decreasing.
@@ -83,7 +54,6 @@ export const getWorldPopulationRank = async (dob, sex, country) => {
     }
   };
 
-  // populationAPI.js
 
 // Helper function to calculate eye blinks (same for both male and female)
 export const calculateEyeBlinks = (daysAlive) => {
@@ -190,17 +160,10 @@ export const calculateLifeStats = (age, birthdate, gender, country) => {
   };
 };
 
-  
-
-
-
-
-
 
 // Function to fetch remaining life expectancy
 export const getLifeExpectancy = async (sex, country, birthdate) => {
     try {
-      // Ensure the sex parameter is lowercase
       const gender = sex.toLowerCase();
       
       // Get the current date in YYYY-MM-DD format

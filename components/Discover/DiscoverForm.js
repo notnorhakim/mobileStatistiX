@@ -2,26 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, Button, StyleSheet, ScrollView, Modal, Share} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getLifeExpectancy , getWorldPopulationRank, getTotalLifeExpectancy, calculateLifeStats} from './statsAPI';
-import SimpleLineBar from './LifeProgressBar'; // Import the progress bar component
-
-
+import SimpleLineBar from './LifeProgressBar'; // progress bar component
 
 
 // Helper function to calculate moon orbits, total days alive, etc.
- export const calculateDaysAlive = (birthdate) => {
+export const calculateDaysAlive = (birthdate) => {
     
-    const birthDateObj = new Date(birthdate);
-  
-    if (isNaN(birthDateObj.getTime())) {
-      return 'Invalid date';
-    }
-  
-    const today = new Date();
-    const daysAlive = Math.floor((today - birthDateObj) / (1000 * 60 * 60 * 24));
-  
-    return daysAlive;
+  const birthDateObj = new Date(birthdate);
+
+  if (isNaN(birthDateObj.getTime())) {
+    return 'Invalid date';
+  }
+
+  const today = new Date();
+  const daysAlive = Math.floor((today - birthDateObj) / (1000 * 60 * 60 * 24));
+
+  return daysAlive;
 };
-  
+
 // Helper function to calculate heartbeats and breaths
 const calculateHeartbeatsAndBreaths = (birthdate) => {
     const daysAlive = calculateDaysAlive(birthdate);
@@ -45,7 +43,6 @@ function calculateAge(birthdate) {
   // Split the birthdate in the format YYYY-MM-DD
   const [year, month, day] = birthdate.split('-');
 
-  // Create a Date object using the year, month (subtract 1 because months are zero-indexed), and day
   const birthDateObj = new Date(year, month - 1, day);
 
   if (isNaN(birthDateObj.getTime())) {
@@ -57,7 +54,6 @@ function calculateAge(birthdate) {
   let months = today.getMonth() - birthDateObj.getMonth();
   let days = today.getDate() - birthDateObj.getDate();
 
-  // Adjust the months and days if necessary
   if (days < 0) {
     months -= 1;
     days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
@@ -78,7 +74,7 @@ export const calculateUpcomingMilestone = (birthdate, lifeExpectancyYears, miles
     return 'Invalid date';
   }
 
-  const lifeExpectancy = parseFloat(lifeExpectancyYears.split(' ')[0]); // Extract the numerical part of life expectancy
+  const lifeExpectancy = parseFloat(lifeExpectancyYears.split(' ')[0]); 
 
   // Calculate life milestones (quarter-life, half-life, 75%, full-life)
   const quarterLifeYears = lifeExpectancy / 4;
@@ -156,7 +152,7 @@ const handleShareStats = (stats, userName) => {
       return;
     }
 
-     // Debug: Log the username before sharing
+
      console.log("Username being shared:", userName);
 
    // Calculate the percentage of life passed
@@ -193,7 +189,7 @@ const handleShareStats = (stats, userName) => {
     ${stats.upcomingMilestones.map(milestone => `
         ${milestone.milestone === 'Half-Life Milestone' ? 'Half of your life' : milestone.milestone.toLocaleString()} on ${milestone.date.toDateString()}
     `).join('')}
-    `.replace(/\n\s+/g, '\n'); // Clean up extra spaces and newlines
+    `.replace(/\n\s+/g, '\n');
 
 
   // Trigger the native share dialog
@@ -361,7 +357,7 @@ function DiscoverBirthdate() {
     <View style={styles.container}>
       <Text style={styles.title}>Discover Your Data</Text>
 
-      {/* Button to open the date picker */}
+      
       <Text style={styles.label}>Select Date of Birth:</Text>
 
       <TouchableOpacity style={styles.datePickerButton} onPress={showDatepicker}>
@@ -433,7 +429,7 @@ function DiscoverBirthdate() {
         <Text style={styles.buttonText}>Submit</Text>
       </TouchableOpacity>
       <ScrollView 
-        contentContainerStyle={styles.scrollContentContainer} // Ensure ScrollView scrolls properly
+        contentContainerStyle={styles.scrollContentContainer} 
       >
       {stats && stats.age && (
         <View style={styles.resultContainer}>
@@ -453,8 +449,6 @@ function DiscoverBirthdate() {
         <Text>Country Population Rank (Same Gender) 💯: # {stats.worldPopulationRank}</Text>
         <Text>Eye Blinks 👁️: {stats.calculatedLifeStats.eyeBlinks}</Text>
         <Text>Steps Taken 🐾: {stats.calculatedLifeStats.stepsTaken}</Text>
-        {/* <Text>How Much Poop in Liters: {stats.calculatedLifeStats.poopLiters}</Text>
-        <Text>How Much Pee in Liters: {stats.calculatedLifeStats.peeLiters}</Text> */}
         <Text>Sleep Time 💤: {stats.calculatedLifeStats.sleepTime} hours </Text>
         <Text>Screen Time 📱: {stats.calculatedLifeStats.screenTime} hours {"\n"}{"\n"}</Text>
         
@@ -566,13 +560,13 @@ const styles = StyleSheet.create({
     alignSelf: 'center', 
   },
   button: {
-    backgroundColor: '#6200ea', // Custom color
+    backgroundColor: '#6200ea', 
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
   },
   buttonStats: {
-    backgroundColor: '#6200ea', // Custom color
+    backgroundColor: '#6200ea', 
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
@@ -580,7 +574,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   buttonText: {
-    color: '#FFFFFF', // White text color
+    color: '#FFFFFF', 
     fontSize: 16,
   },
 });

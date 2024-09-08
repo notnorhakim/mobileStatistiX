@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, Button, StyleSheet, Modal } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { getLifeExpectancy, getTotalLifeExpectancy } from '../Discover/statsAPI'; // Assuming these are implemented
-import { calculateDaysAlive } from '../Discover/DiscoverForm'; // Assuming this is implemented
-import { useNavigation } from '@react-navigation/native'; // Import navigation hook
+import { getLifeExpectancy, getTotalLifeExpectancy } from '../Discover/statsAPI'; 
+import { calculateDaysAlive } from '../Discover/DiscoverForm'; 
+import { useNavigation } from '@react-navigation/native'; 
 
 
 
@@ -14,16 +14,16 @@ function DiscoverBirthdate() {
 
   const navigation = useNavigation(); // Access navigation
 
-  const [birthdate, setBirthdate] = useState(new Date()); // Store birthdate as a Date object
+  const [birthdate, setBirthdate] = useState(new Date()); 
   const [showDatePicker, setShowDatePicker] = useState(false); // Control visibility of the Date Picker
-  const [countryInput, setCountryInput] = useState(''); // State for country search input
-  const [filteredCountries, setFilteredCountries] = useState([]); // Filtered country list
-  const [selectedCountry, setSelectedCountry] = useState(''); // Selected country
+  const [countryInput, setCountryInput] = useState(''); 
+  const [filteredCountries, setFilteredCountries] = useState([]); 
+  const [selectedCountry, setSelectedCountry] = useState(''); 
   const [countries, setCountries] = useState([]); // List of countries
   const [selectedGender, setSelectedGender] = useState(''); // Selected gender
   const [genderModalVisible, setGenderModalVisible] = useState(false); // Control gender modal visibility
-  const [lifeExpectancy, setLifeExpectancy] = useState(null); // Store life expectancy
-  const [stats, setStats] = useState(null); // Store calculated stats like days alive
+  const [lifeExpectancy, setLifeExpectancy] = useState(null); 
+  const [stats, setStats] = useState(null); 
 
   // List of gender options
   const genders = [

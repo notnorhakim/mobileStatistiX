@@ -15,7 +15,7 @@ export const getCountryIndicator = async (country, indicator) => {
       return response.json(); // Parse the JSON response
     })
     .then((data) => {
-      return data[1]; // Returning the actual data array from the JSON response
+      return data[1]; 
     })
     .catch((error) => {
       console.error('Error fetching data:', error);

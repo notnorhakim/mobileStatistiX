@@ -6,7 +6,7 @@ function Home({ navigation }) {
   return (
     <View style={styles.container}>
       <StatusBar hidden={false} />
-      <Text style={styles.header}>Welcome to GraphX</Text>
+      <Text style={styles.header}>Welcome to StatistiX</Text>
       
       <TouchableOpacity 
         style={styles.card} 

@@ -13,7 +13,7 @@ const InsightsResults = ({ route, navigation }) => {
     );
   }
 
-  const { indicator, country, countryiso3code } = data[0]; // Assuming all data entries share the same indicator and country
+  const { indicator, country, countryiso3code } = data[0]; 
 
   return (
     <View style={styles.container}>
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    color: '#FFFFFF', // White text color
+    color: '#FFFFFF', 
     fontSize: 16,
   },
 });

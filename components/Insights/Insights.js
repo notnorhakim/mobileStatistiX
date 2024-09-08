@@ -47,7 +47,7 @@ function Insights({ navigation }) {
   useEffect(() => {
     if (mainCategory) {
       setSubCategories(categories[mainCategory].subCategories);
-      setIndicator(''); // Reset indicator when main category changes
+      setIndicator(''); 
     }
   }, [mainCategory]);
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Dimensions, StyleSheet, ScrollView, Text, Modal, TouchableOpacity, FlatList } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import { getCountryIndicator } from '../../services/api';  // Adjust the path if necessary
+import { getCountryIndicator } from '../../services/api'; 
 
 export const formatNumberWithCommas = (number) => {
     if (number === null || number === undefined) {
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   button: {
-    backgroundColor: '#6200ea', // Custom color
+    backgroundColor: '#6200ea', 
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
